@@ -21,12 +21,25 @@ db.connect();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+const createUsersTable = `
+    CREATE TABLE IF NOT EXISTS  todos (
+        id SERIAL PRIMARY KEY,
+        task TEXT NOT NULL
+    );
+`;
+
+db.query(createUsersTable, (err) => {
+  if (err) {
+    console.error("Error creating posts table:", err);
+  } else {
+    console.log("Posts table created successfully!");
+  }
+});
+
 // Routes
 app.get("/", async (req, res) => {
   try {
-    const result = await db.query(
-      "SELECT * FROM todos ORDER BY created_at DESC"
-    );
+    const result = await db.query("SELECT * FROM todos ORDER BY id DESC");
     const todos = result.rows;
     res.render("index.ejs", { todos });
   } catch (err) {
